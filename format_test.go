@@ -14,13 +14,13 @@ func TestFormatDDL(t *testing.T) {
 	}{
 		{
 			name: "Single DDL",
-			ddl:  `CREATE TABLE User (ID STRING(MAX) NOT NULL, Name STRING(MAX), Age INT64, CreatedAt TIMESTAMP NOT NULL OPTIONS ( allow_commit_timestamp = true )) PRIMARY KEY (ID);`,
+			ddl:  `CREATE TABLE User (ID STRING(MAX) NOT NULL, Title STRING(MAX) NOT NULL, Artist STRING(MAX) NOT NULL, CreatedAt TIMESTAMP NOT NULL OPTIONS (allow_commit_timestamp = true)) PRIMARY KEY(ID);`,
 			want: `CREATE TABLE User (
   ID STRING(MAX) NOT NULL,
-  Name STRING(MAX),
-  Age INT64,
-  CreatedAt TIMESTAMP NOT NULL OPTIONS ( allow_commit_timestamp = true ),
-) PRIMARY KEY (ID);
+  Title STRING(MAX) NOT NULL,
+  Artist STRING(MAX) NOT NULL,
+  CreatedAt TIMESTAMP NOT NULL OPTIONS (allow_commit_timestamp = true),
+) PRIMARY KEY(ID);
 `,
 		},
 	}
