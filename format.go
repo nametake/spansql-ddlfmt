@@ -41,8 +41,8 @@ func (c *CommentItem) SQL() string {
 	return strings.Join(comments, "\n")
 }
 
-func FormatDDL(ddlStr string) (string, error) {
-	parsedDDL, err := spansql.ParseDDL("f", ddlStr)
+func FormatDDL(filename, ddlStr string) (string, error) {
+	parsedDDL, err := spansql.ParseDDL(filename, ddlStr)
 	if err != nil {
 		return "", fmt.Errorf("parse DDL: %v", err)
 	}

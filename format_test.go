@@ -76,7 +76,7 @@ CREATE CHANGE STREAM SingerAlbumStream FOR Singers, Albums;`,
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := FormatDDL(tt.ddl)
+			got, err := FormatDDL("test.sql", tt.ddl)
 			if err != nil {
 				t.Fatalf("FormatDDL() error = %v", err)
 			}
