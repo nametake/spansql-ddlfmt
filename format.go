@@ -33,8 +33,11 @@ func (c *CommentItem) Pos() spansql.Position {
 }
 
 func (c *CommentItem) SQL() string {
-	// return c.comment.SQL()
-	return ""
+	comments := make([]string, 0, len(c.comment.Text))
+	for _, text := range c.comment.Text {
+		comments = append(comments, fmt.Sprintf("-- %s", text))
+	}
+	return strings.Join(comments, "\n")
 }
 
 func FormatDDL(ddlStr string) (string, error) {
@@ -47,6 +50,10 @@ func FormatDDL(ddlStr string) (string, error) {
 
 	for _, ddl := range parsedDDL.List {
 		items = append(items, &DDLItem{ddl})
+	}
+
+	for _, comment := range parsedDDL.Comments {
+		items = append(items, &CommentItem{comment})
 	}
 
 	var sqls []string
