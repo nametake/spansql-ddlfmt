@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 
 	"cloud.google.com/go/spanner/spansql"
@@ -21,7 +22,7 @@ func (d *DDLItem) Pos() spansql.Position {
 }
 
 func (d *DDLItem) SQL() string {
-	return d.ddl.SQL()
+	return fmt.Sprintf("%s;", d.ddl.SQL())
 }
 
 type CommentItem struct {
@@ -56,9 +57,13 @@ func FormatDDL(ddlStr string) (string, error) {
 		items = append(items, &CommentItem{comment})
 	}
 
+	slices.SortFunc(items, func(a, b Item) int {
+		return a.Pos().Line - b.Pos().Line
+	})
+
 	var sqls []string
 	for _, item := range items {
-		sql := fmt.Sprintf("%s;", item.SQL())
+		sql := fmt.Sprintf("%s", item.SQL())
 		sqls = append(sqls, sql)
 	}
 
