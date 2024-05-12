@@ -58,6 +58,7 @@ CREATE CHANGE STREAM SingerAlbumStream FOR Singers, Albums;`,
 			ddl: `CREATE TABLE Album (ID STRING(MAX) NOT NULL, Title STRING(MAX) NOT NULL, Artist STRING(MAX) NOT NULL, CreatedAt TIMESTAMP NOT NULL OPTIONS (allow_commit_timestamp = true)) PRIMARY KEY(ID);
 -- COMMENT Block 1
 -- COMMENT Block 2
+CREATE CHANGE STREAM SingerAlbumStream FOR Singers, Albums;
 			`,
 			want: `CREATE TABLE Album (
   ID STRING(MAX) NOT NULL,
@@ -67,7 +68,9 @@ CREATE CHANGE STREAM SingerAlbumStream FOR Singers, Albums;`,
 ) PRIMARY KEY(ID);
 
 -- COMMENT Block 1
--- COMMENT Block 2`,
+-- COMMENT Block 2
+
+CREATE CHANGE STREAM SingerAlbumStream FOR Singers, Albums;`,
 		},
 	}
 
