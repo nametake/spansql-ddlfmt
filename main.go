@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	write := flag.Bool("w", false, "write")
+	write := flag.Bool("w", false, "write file")
 	flag.Parse()
 
 	args := flag.Args()
