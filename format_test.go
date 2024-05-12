@@ -20,8 +20,24 @@ func TestFormatDDL(t *testing.T) {
   Title STRING(MAX) NOT NULL,
   Artist STRING(MAX) NOT NULL,
   CreatedAt TIMESTAMP NOT NULL OPTIONS (allow_commit_timestamp = true),
+) PRIMARY KEY(ID);`,
+		},
+		{
+			name: "Single DDL",
+			ddl: `CREATE TABLE User (ID STRING(MAX) NOT NULL, Title STRING(MAX) NOT NULL, Artist STRING(MAX) NOT NULL, CreatedAt TIMESTAMP NOT NULL OPTIONS (allow_commit_timestamp = true)) PRIMARY KEY(ID);
+CREATE TABLE Artist (ID STRING(MAX) NOT NULL, Name STRING(MAX) NOT NULL, CreatedAt TIMESTAMP NOT NULL OPTIONS (allow_commit_timestamp = true)) PRIMARY KEY(ID);`,
+			want: `CREATE TABLE User (
+  ID STRING(MAX) NOT NULL,
+  Title STRING(MAX) NOT NULL,
+  Artist STRING(MAX) NOT NULL,
+  CreatedAt TIMESTAMP NOT NULL OPTIONS (allow_commit_timestamp = true),
 ) PRIMARY KEY(ID);
-`,
+
+CREATE TABLE Artist (
+  ID STRING(MAX) NOT NULL,
+  Name STRING(MAX) NOT NULL,
+  CreatedAt TIMESTAMP NOT NULL OPTIONS (allow_commit_timestamp = true),
+) PRIMARY KEY(ID);`,
 		},
 	}
 
