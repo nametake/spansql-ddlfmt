@@ -53,6 +53,22 @@ FOR Singers, Albums;`,
 
 CREATE CHANGE STREAM SingerAlbumStream FOR Singers, Albums;`,
 		},
+		{
+			name: "Comment block",
+			ddl: `CREATE TABLE Album (ID STRING(MAX) NOT NULL, Title STRING(MAX) NOT NULL, Artist STRING(MAX) NOT NULL, CreatedAt TIMESTAMP NOT NULL OPTIONS (allow_commit_timestamp = true)) PRIMARY KEY(ID);
+-- COMMENT Block 1
+-- COMMENT Block 2
+			`,
+			want: `CREATE TABLE Album (
+  ID STRING(MAX) NOT NULL,
+  Title STRING(MAX) NOT NULL,
+  Artist STRING(MAX) NOT NULL,
+  CreatedAt TIMESTAMP NOT NULL OPTIONS (allow_commit_timestamp = true),
+) PRIMARY KEY(ID);
+
+-- COMMENT Block 1
+-- COMMENT Block 2`,
+		},
 	}
 
 	for _, tt := range tests {
