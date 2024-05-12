@@ -9,6 +9,7 @@ import (
 )
 
 func main() {
+	write := flag.Bool("w", false, "write")
 	flag.Parse()
 
 	args := flag.Args()
@@ -19,7 +20,7 @@ func main() {
 	}
 
 	filename := args[0]
-	if err := run(filename); err != nil {
+	if err := run(filename, *write); err != nil {
 		log.Fatalf("error: %v", err)
 	}
 }
