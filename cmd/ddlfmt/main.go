@@ -6,6 +6,8 @@ import (
 	"io"
 	"log"
 	"os"
+
+	ddlfmt "github.com/nametake/spansql-ddlfmt"
 )
 
 func main() {
@@ -25,24 +27,13 @@ func main() {
 	}
 }
 
-func output(filename string, write bool) (io.WriteCloser, error) {
-	if !write {
-		return os.Stdout, nil
-	}
-	file, err := os.Create(filename)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create file: %v", err)
-	}
-	return file, nil
-}
-
 func run(filename string, write bool) error {
 	content, err := os.ReadFile(filename)
 	if err != nil {
 		return fmt.Errorf("failed to read file: %v", err)
 	}
 
-	ddl, err := FormatDDL(filename, string(content))
+	ddl, err := ddlfmt.FormatDDL(filename, string(content))
 	if err != nil {
 		return fmt.Errorf("failed to format DDL: %v", err)
 	}
@@ -58,4 +49,15 @@ func run(filename string, write bool) error {
 	}
 
 	return nil
+}
+
+func output(filename string, write bool) (io.WriteCloser, error) {
+	if !write {
+		return os.Stdout, nil
+	}
+	file, err := os.Create(filename)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create file: %v", err)
+	}
+	return file, nil
 }
