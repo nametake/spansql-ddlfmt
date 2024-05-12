@@ -110,7 +110,7 @@ CREATE TABLE Artist (
   CreatedAt TIMESTAMP NOT NULL OPTIONS (allow_commit_timestamp = true),
 ) PRIMARY KEY(ID);`,
 			want: `CREATE TABLE Album (
-  ID STRING(MAX) NOT NULL, -- ID Comment
+  ID STRING(MAX) NOT NULL, -- ID comment
   -- Title head comment
   Title STRING(MAX) NOT NULL, -- Title tail comment
   Artist STRING(MAX) NOT NULL,
