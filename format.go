@@ -63,8 +63,7 @@ func FormatDDL(ddlStr string) (string, error) {
 
 	var sqls []string
 	for _, item := range items {
-		sql := fmt.Sprintf("%s", item.SQL())
-		sqls = append(sqls, sql)
+		sqls = append(sqls, item.SQL())
 	}
 
 	return strings.Join(sqls, "\n\n"), nil
