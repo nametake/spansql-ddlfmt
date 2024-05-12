@@ -72,6 +72,33 @@ CREATE CHANGE STREAM SingerAlbumStream FOR Singers, Albums;
 
 CREATE CHANGE STREAM SingerAlbumStream FOR Singers, Albums;`,
 		},
+		{
+			name: "Inline comment",
+			ddl: `CREATE TABLE Album (
+  ID STRING(MAX) NOT NULL, -- ID Comment
+  -- Title Comment
+  Title STRING(MAX) NOT NULL,
+  Artist STRING(MAX) NOT NULL,
+  CreatedAt TIMESTAMP NOT NULL OPTIONS (allow_commit_timestamp = true),
+) PRIMARY KEY(ID);
+
+-- COMMENT 1
+-- COMMENT 2
+
+CREATE CHANGE STREAM SingerAlbumStream FOR Singers, Albums;`,
+			want: `CREATE TABLE Album (
+  ID STRING(MAX) NOT NULL, -- ID Comment
+  -- Title Comment
+  Title STRING(MAX) NOT NULL,
+  Artist STRING(MAX) NOT NULL,
+  CreatedAt TIMESTAMP NOT NULL OPTIONS (allow_commit_timestamp = true),
+) PRIMARY KEY(ID);
+
+-- COMMENT 1
+-- COMMENT 2
+
+CREATE CHANGE STREAM SingerAlbumStream FOR Singers, Albums;`,
+		},
 	}
 
 	for _, tt := range tests {
