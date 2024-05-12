@@ -1,0 +1,1 @@
+# spansql-ddlfmt
