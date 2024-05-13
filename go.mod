@@ -1,6 +1,6 @@
 module github.com/nametake/spansql-ddlfmt
 
-go 1.22.2
+go 1.22
 
 require (
 	cloud.google.com/go v0.112.2 // indirect
