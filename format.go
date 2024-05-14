@@ -2,7 +2,6 @@ package ddlfmt
 
 import (
 	"fmt"
-	"slices"
 	"strings"
 
 	"cloud.google.com/go/spanner/spansql"
@@ -10,7 +9,7 @@ import (
 
 type Item interface {
 	Pos() spansql.Position
-	SQL() string
+	SQL(ddl *spansql.DDL) string
 }
 
 type DDLItem struct {
@@ -21,22 +20,27 @@ func (d *DDLItem) Pos() spansql.Position {
 	return d.ddl.Pos()
 }
 
-func (d *DDLItem) SQL() string {
-	return fmt.Sprintf("%s;", d.ddl.SQL())
+func (d *DDLItem) SQL(ddl *spansql.DDL) string {
+	var sql string
+	leadingComment := ddl.LeadingComment(d.ddl)
+
+	if leadingComment != nil {
+		fmt.Println(leadingComment)
+		cmt := formatComment(leadingComment, "")
+		sql = fmt.Sprintf("%s\n", cmt)
+		diff := leadingComment.Pos().Line - d.ddl.Pos().Line
+		if diff != 1 {
+			sql += "\n"
+		}
+	}
+	sql += fmt.Sprintf("%s;", d.ddl.SQL())
+	return sql
 }
 
-type CommentItem struct {
-	comment *spansql.Comment
-}
-
-func (c *CommentItem) Pos() spansql.Position {
-	return c.comment.Pos()
-}
-
-func (c *CommentItem) SQL() string {
-	comments := make([]string, 0, len(c.comment.Text))
-	for _, text := range c.comment.Text {
-		comments = append(comments, fmt.Sprintf("-- %s", text))
+func formatComment(comment *spansql.Comment, indent string) string {
+	comments := make([]string, 0, len(comment.Text))
+	for _, text := range comment.Text {
+		comments = append(comments, fmt.Sprintf("%s-- %s", indent, text))
 	}
 	return strings.Join(comments, "\n")
 }
@@ -53,17 +57,9 @@ func FormatDDL(filename, ddlStr string) (string, error) {
 		items = append(items, &DDLItem{ddl})
 	}
 
-	for _, comment := range parsedDDL.Comments {
-		items = append(items, &CommentItem{comment})
-	}
-
-	slices.SortFunc(items, func(a, b Item) int {
-		return a.Pos().Line - b.Pos().Line
-	})
-
 	var sqls []string
 	for _, item := range items {
-		sqls = append(sqls, item.SQL())
+		sqls = append(sqls, item.SQL(parsedDDL))
 	}
 
 	return strings.Join(sqls, "\n\n"), nil
