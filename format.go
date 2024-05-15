@@ -10,7 +10,7 @@ import (
 
 type Item interface {
 	Pos() spansql.Position
-	SQL() string
+	SQL(ddl *spansql.DDL) string
 }
 
 type DDLItem struct {
@@ -30,7 +30,7 @@ func (d *DDLItem) Pos() spansql.Position {
 	return d.ddlStmt.Pos()
 }
 
-func (d *DDLItem) SQL() string {
+func (d *DDLItem) SQL(ddl *spansql.DDL) string {
 	var sql string
 
 	if d.leadingComment != nil {
@@ -41,7 +41,47 @@ func (d *DDLItem) SQL() string {
 			sql += "\n"
 		}
 	}
-	sql += fmt.Sprintf("%s;", d.ddlStmt.SQL())
+	switch stmt := d.ddlStmt.(type) {
+	case *spansql.CreateTable:
+		str := "CREATE TABLE "
+		if stmt.IfNotExists {
+			str += "IF NOT EXISTS "
+		}
+		str += stmt.Name.SQL() + " (\n"
+		for _, c := range stmt.Columns {
+			if leadingComment := ddl.LeadingComment(c); leadingComment != nil {
+				str += formatComment(leadingComment, "  ") + "\n"
+			}
+			str += "  " + c.SQL() + ","
+			if inlineComment := ddl.InlineComment(c); inlineComment != nil {
+				str += " " + formatComment(inlineComment, "")
+			}
+			str += "\n"
+		}
+		for _, tc := range stmt.Constraints {
+			str += "  " + tc.SQL() + ",\n"
+		}
+		if len(stmt.Synonym) > 0 {
+			str += "  SYNONYM(" + stmt.Synonym.SQL() + "),\n"
+		}
+		str += ") PRIMARY KEY("
+		for i, c := range stmt.PrimaryKey {
+			if i > 0 {
+				str += ", "
+			}
+			str += c.SQL()
+		}
+		str += ")"
+		if il := stmt.Interleave; il != nil {
+			str += ",\n  INTERLEAVE IN PARENT " + il.Parent.SQL() + " ON DELETE " + il.OnDelete.SQL()
+		}
+		if rdp := stmt.RowDeletionPolicy; rdp != nil {
+			str += ",\n  " + rdp.SQL()
+		}
+		sql += fmt.Sprintf("%s;", str)
+	default:
+		sql += fmt.Sprintf("%s;", stmt.SQL())
+	}
 	return sql
 }
 
@@ -53,7 +93,7 @@ func (c *CommentItem) Pos() spansql.Position {
 	return c.comment.Pos()
 }
 
-func (c *CommentItem) SQL() string {
+func (c *CommentItem) SQL(_ *spansql.DDL) string {
 	return formatComment(c.comment, "")
 }
 
@@ -83,6 +123,17 @@ func FormatDDL(filename, ddlStr string) (string, error) {
 		if leadingComment != nil {
 			delete(commentsMap, leadingComment.Pos().Line)
 		}
+		switch stmt := ddlStmt.(type) {
+		case *spansql.CreateTable:
+			for _, c := range stmt.Columns {
+				if leadingComment := ddl.LeadingComment(c); leadingComment != nil {
+					delete(commentsMap, leadingComment.Pos().Line)
+				}
+				if inlineComment := ddl.InlineComment(c); inlineComment != nil {
+					delete(commentsMap, inlineComment.Pos().Line)
+				}
+			}
+		}
 
 		items = append(items, NewDDLItem(ddl, ddlStmt))
 	}
@@ -97,7 +148,7 @@ func FormatDDL(filename, ddlStr string) (string, error) {
 
 	var sqls []string
 	for _, item := range items {
-		sqls = append(sqls, item.SQL())
+		sqls = append(sqls, item.SQL(ddl))
 	}
 
 	return strings.Join(sqls, "\n\n"), nil
