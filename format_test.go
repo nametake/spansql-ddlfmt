@@ -87,7 +87,6 @@ CREATE CHANGE STREAM SingerAlbumStream FOR Singers, Albums;
 
 -- COMMENT 1
 -- COMMENT 2
-
 CREATE CHANGE STREAM SingerAlbumStream FOR Singers, Albums;`,
 		},
 		{
@@ -167,11 +166,10 @@ CREATE TABLE Artist (
 			want: `CREATE TABLE Album (
   ID STRING(MAX) NOT NULL, # ID comment
   # Title head comment
-  Title STRING(MAX) NOT NULL, # Title tail comment
+  Title STRING(MAX) NOT NULL, ## Title tail comment
   Artist STRING(MAX) NOT NULL,
   CreatedAt TIMESTAMP NOT NULL OPTIONS (allow_commit_timestamp = true),
 ) PRIMARY KEY(ID);
-
 
 ####################
 ## Styled Comment ##
@@ -192,6 +190,7 @@ comment
 star
 multi
 line
+leading
 comment
 */
 CREATE TABLE Artist (

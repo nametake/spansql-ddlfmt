@@ -37,8 +37,9 @@ func (d *DDLItem) SQL(ddl *spansql.DDL) string {
 	if d.leadingComment != nil {
 		cmt := formatComment(d.leadingComment, "")
 		sql = fmt.Sprintf("%s\n", cmt)
-		diff := d.ddlStmt.Pos().Line - d.leadingComment.Pos().Line
-		if diff != 1 {
+		lineCount := countLines(cmt)
+		diff := d.ddlStmt.Pos().Line - lineCount
+		if diff != d.leadingComment.Pos().Line {
 			sql += "\n"
 		}
 	}
@@ -103,20 +104,24 @@ func firstChar(str string) rune {
 	return r
 }
 
+func countLines(text string) int {
+	lines := strings.Split(text, "\n")
+	return len(lines)
+}
+
 func formatComment(comment *spansql.Comment, indent string) string {
 	comments := make([]string, 0, len(comment.Text))
-	fmt.Println(comment)
 	switch comment.Marker {
 	case "#":
 		for _, text := range comment.Text {
-			if firstChar(text) != '#' {
+			if c := firstChar(text); c != '#' && c != ' ' {
 				text = " " + text
 			}
 			comments = append(comments, fmt.Sprintf("%s#%s", indent, text))
 		}
 	case "--":
 		for _, text := range comment.Text {
-			if firstChar(text) != '-' {
+			if c := firstChar(text); c != '-' && c != ' ' {
 				text = " " + text
 			}
 			comments = append(comments, fmt.Sprintf("%s--%s", indent, text))
@@ -125,11 +130,17 @@ func formatComment(comment *spansql.Comment, indent string) string {
 		if len(comment.Text) == 1 {
 			comments = append(comments, fmt.Sprintf("%s/* %s */", indent, comment.Text[0]))
 		} else {
-			comments = append(comments, fmt.Sprintf("%s/*", indent))
-			for _, text := range comment.Text {
-				comments = append(comments, fmt.Sprintf("%s%s", indent, text))
+			textLen := len(comment.Text)
+			for i, text := range comment.Text {
+				switch {
+				case i == 0:
+					comments = append(comments, fmt.Sprintf("%s/*%s", indent, text))
+				case i == textLen-1:
+					comments = append(comments, fmt.Sprintf("%s%s*/", indent, text))
+				default:
+					comments = append(comments, fmt.Sprintf("%s%s", indent, text))
+				}
 			}
-			comments = append(comments, fmt.Sprintf("%s*/", indent))
 		}
 	}
 	return strings.Join(comments, "\n")
