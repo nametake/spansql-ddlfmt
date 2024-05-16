@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"slices"
 	"strings"
+	"unicode/utf8"
 
 	"cloud.google.com/go/spanner/spansql"
 )
@@ -97,10 +98,39 @@ func (c *CommentItem) SQL(_ *spansql.DDL) string {
 	return formatComment(c.comment, "")
 }
 
+func firstChar(str string) rune {
+	r, _ := utf8.DecodeRuneInString(str)
+	return r
+}
+
 func formatComment(comment *spansql.Comment, indent string) string {
 	comments := make([]string, 0, len(comment.Text))
-	for _, text := range comment.Text {
-		comments = append(comments, fmt.Sprintf("%s-- %s", indent, text))
+	fmt.Println(comment)
+	switch comment.Marker {
+	case "#":
+		for _, text := range comment.Text {
+			if firstChar(text) != '#' {
+				text = " " + text
+			}
+			comments = append(comments, fmt.Sprintf("%s#%s", indent, text))
+		}
+	case "--":
+		for _, text := range comment.Text {
+			if firstChar(text) != '-' {
+				text = " " + text
+			}
+			comments = append(comments, fmt.Sprintf("%s--%s", indent, text))
+		}
+	case "/*":
+		if len(comment.Text) == 1 {
+			comments = append(comments, fmt.Sprintf("%s/* %s */", indent, comment.Text[0]))
+		} else {
+			comments = append(comments, fmt.Sprintf("%s/*", indent))
+			for _, text := range comment.Text {
+				comments = append(comments, fmt.Sprintf("%s%s", indent, text))
+			}
+			comments = append(comments, fmt.Sprintf("%s*/", indent))
+		}
 	}
 	return strings.Join(comments, "\n")
 }
