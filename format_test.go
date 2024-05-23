@@ -24,7 +24,8 @@ Artist STRING(MAX) NOT NULL, CreatedAt TIMESTAMP NOT NULL OPTIONS (allow_commit_
   Title STRING(MAX) NOT NULL,
   Artist STRING(MAX) NOT NULL,
   CreatedAt TIMESTAMP NOT NULL OPTIONS (allow_commit_timestamp = true),
-) PRIMARY KEY(ID);`,
+) PRIMARY KEY(ID);
+`,
 		},
 		{
 			name: "Two DDL",
@@ -51,7 +52,8 @@ CREATE TABLE Artist (
   ID STRING(MAX) NOT NULL,
   Name STRING(MAX) NOT NULL,
   CreatedAt TIMESTAMP NOT NULL OPTIONS (allow_commit_timestamp = true),
-) PRIMARY KEY(ID);`,
+) PRIMARY KEY(ID);
+`,
 		},
 		{
 			name: "Stream DDL",
@@ -71,7 +73,8 @@ FOR Singers, Albums;`,
   CreatedAt TIMESTAMP NOT NULL OPTIONS (allow_commit_timestamp = true),
 ) PRIMARY KEY(ID);
 
-CREATE CHANGE STREAM SingerAlbumStream FOR Singers, Albums;`,
+CREATE CHANGE STREAM SingerAlbumStream FOR Singers, Albums;
+`,
 		},
 		{
 			name: "Comment block",
@@ -91,7 +94,8 @@ CREATE CHANGE STREAM SingerAlbumStream FOR Singers, Albums;
 -- COMMENT 1
 -- COMMENT 2
 
-CREATE CHANGE STREAM SingerAlbumStream FOR Singers, Albums;`,
+CREATE CHANGE STREAM SingerAlbumStream FOR Singers, Albums;
+`,
 		},
 		{
 			name: "Inline comment",
@@ -128,7 +132,8 @@ CREATE TABLE Artist (
   ID STRING(MAX) NOT NULL,
   Name STRING(MAX) NOT NULL,
   CreatedAt TIMESTAMP NOT NULL OPTIONS (allow_commit_timestamp = true),
-) PRIMARY KEY(ID);`,
+) PRIMARY KEY(ID);
+`,
 		},
 		{
 			name: "Comment pattern",
@@ -201,7 +206,8 @@ CREATE TABLE Artist (
   ID STRING(MAX) NOT NULL,
   Name STRING(MAX) NOT NULL,
   CreatedAt TIMESTAMP NOT NULL OPTIONS (allow_commit_timestamp = true),
-) PRIMARY KEY(ID);`,
+) PRIMARY KEY(ID);
+`,
 		},
 	}
 

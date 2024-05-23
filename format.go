@@ -192,5 +192,5 @@ func FormatDDL(filename, ddlStr string) (string, error) {
 		sqls = append(sqls, item.SQL(ddl))
 	}
 
-	return strings.Join(sqls, "\n\n"), nil
+	return strings.Join(sqls, "\n\n") + "\n", nil
 }
